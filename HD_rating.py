@@ -6,6 +6,7 @@ class RatingsBreakdown (MRJob):
         return [
             MRStep(mapper=self.mapper_get_ratings,
                    reducer=self.reducer_count_ratings)
+            MRStep(reducer=self.reducer_sorted_output)
         ]
 
     def mapper_get_ratings(self, _, line):
@@ -14,6 +15,10 @@ class RatingsBreakdown (MRJob):
 
     def reducer_count_ratings (self, key, values):
         yield key, sum(values)
+        
+    def reducer_sorted_output(self, count, movies):
+        for movie in movies:
+            yield movie, count
 
 if __name__ == '__main__':
     RatingsBreakdown.run()
