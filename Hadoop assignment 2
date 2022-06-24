@@ -1,0 +1,22 @@
+DEFINE CSVExcelStorage org.apache.pig.piggybank.storage.CSVExcelStorage; 
+
+orders = LOAD '/user/maria_dev/diplomacy/orders.csv' USING CSVExcelStorage() AS
+(game_id:int,
+unit_id:int,
+unit_order:chararray,
+location:chararray,
+target:chararray,
+target_dest:chararray,
+success:int,
+reason:int,
+turn_num:int);
+
+orders_filtered = FILTER orders BY target == 'Holland';
+
+orders_grouped = GROUP orders_filtered BY (location, target);
+
+orders_unordered = FOREACH orders_grouped GENERATE group, COUNT(orders_filtered);
+
+orders_ordered = ORDER orders_unordered BY $0 ASC;
+
+DUMP orders_ordered;
